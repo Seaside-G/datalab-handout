@@ -231,7 +231,8 @@ int conditional(int x, int y, int z)
  */
 int isLessOrEqual(int x, int y)
 {
-  return 2;
+  int t=y+negate(x);
+  return !(t&(1<<31));
 }
 // 4
 /*
