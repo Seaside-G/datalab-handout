@@ -228,6 +228,7 @@ int conditional(int x, int y, int z)
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 24
  *   Rating: 3
+ * 
  */
 int isLessOrEqual(int x, int y)
 {
