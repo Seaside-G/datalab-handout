@@ -282,7 +282,7 @@ int howManyBits(int x)
 	int ans = b0 + b1 + b2 + b4 + b8 + b16 + 1;
 	return iszero | (mask & ans);
 }
-// float
+//   float
 /*
  * floatScale2 - Return bit-level equivalent of expression 2*f for
  *   floating point argument f.
