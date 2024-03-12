@@ -309,13 +309,14 @@ unsigned floatScale2(unsigned uf)
 	{
 		return uf;
 	}
-	//非规格化
-	if(expr==0){
-		frac<<=1;
-		return (s<<31)|frac;
+	// 非规格化
+	if (expr == 0)
+	{
+		frac <<= 1;
+		return (s << 31) | frac;
 	}
 	++expr;
-	return (s<<31)|(expr<<23)|frac;
+	return (s << 31) | (expr << 23) | frac;
 }
 /*
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
@@ -331,7 +332,48 @@ unsigned floatScale2(unsigned uf)
  */
 int floatFloat2Int(unsigned uf)
 {
-	return 2;
+	int s = (uf >> 31) & 1;
+	int expr = (uf >> 23) & (0xff);
+	int frac = uf & (0x7ffff);
+	// 0
+	if (expr == 0 && frac == 0)
+	{
+		return 0;
+	}
+	// 无穷和nan
+	if (expr == (0xff))
+	{
+		return 0x80000000u;
+	}
+	// 非规格化
+	if (expr == 0)
+	{
+		return 0;
+	}
+	int e = expr - 127;
+	frac = frac | (1 << 23);
+	if (e > 31)
+	{
+		// 说明超int
+		return 0x80000000u;
+	}
+	else if (e < 0)
+	{
+		// 小于1
+		return 0;
+	}
+	// 因为frac有23位
+	if (e >= 23)
+	{
+		frac <<= (e - 23);
+	}
+	else
+	{
+		frac >>= (23 - e);
+	}
+	if (s)
+		return ~frac + 1;
+	return frac;
 }
 /*
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
@@ -348,5 +390,23 @@ int floatFloat2Int(unsigned uf)
  */
 unsigned floatPower2(int x)
 {
-	return 2;
+	// 非规格化 min 2^(-23+1-127) max < 2^(-126)
+	if (x < -149)
+	{
+		return 0;
+	}
+	else if (x < -126)
+	{
+		return (1 << (23 + x + 126));
+	}
+	// 规格化 min 2^126 max < 2^128
+	else if (x < 128)
+	{
+		int e = x + 127;
+		return e << 23;
+	}
+	else
+	{
+		return (0xff) << 23;
+	}
 }
