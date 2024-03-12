@@ -296,7 +296,26 @@ int howManyBits(int x)
  */
 unsigned floatScale2(unsigned uf)
 {
-	return 2;
+	int s = (uf >> 31) & 1;
+	int expr = (uf >> 23) & (0xff);
+	int frac = uf & (0x7fffff);
+	// 0
+	if (expr == 0 && frac == 0)
+	{
+		return uf;
+	}
+	// 无穷大或者nan
+	if (expr == 0xff)
+	{
+		return uf;
+	}
+	//非规格化
+	if(expr==0){
+		frac<<=1;
+		return (s<<31)|frac;
+	}
+	++expr;
+	return (s<<31)|(expr<<23)|frac;
 }
 /*
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
